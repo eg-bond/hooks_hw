@@ -11,9 +11,7 @@ function Task1() {
         <button
           onClick={() =>
             refetch({
-              params: {
-                _limit: 3,
-              },
+              _limit: 3,
             })
           }>
           Перезапросить
