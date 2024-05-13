@@ -8,6 +8,7 @@ function Task1() {
   return (
     <div>
       <div>
+        <h1>Task 1 (useFetch)</h1>
         <button
           onClick={() =>
             refetch({
