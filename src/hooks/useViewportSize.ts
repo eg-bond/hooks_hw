@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+import { useWindowEvent } from './useWindowEvent'
 
 export const useViewportSize = () => {
   const [viewportSize, setViewportSize] = useState({
@@ -6,20 +7,14 @@ export const useViewportSize = () => {
     height: window.innerHeight,
   })
 
-  useEffect(() => {
-    const handleResize = () => {
-      setViewportSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      })
-    }
+  const handleResize = useCallback(() => {
+    setViewportSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    })
+  }, [setViewportSize])
 
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+  useWindowEvent('resize', handleResize)
 
   return viewportSize
 }
