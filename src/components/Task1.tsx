@@ -12,7 +12,7 @@ function Task1() {
         <button
           onClick={() =>
             refetch({
-              _limit: 3,
+              _limit: '3',
             })
           }>
           Перезапросить
