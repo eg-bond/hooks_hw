@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 
-type ParamsT = {
-  _limit?: number
-}
+type QueryParamsT =
+  | {
+      [key: string]: string
+    }
+  | undefined
 
 type DataT = {
   id: number
@@ -11,26 +13,13 @@ type DataT = {
   userId: number
 }
 
-const paramsDefault = {
-  _limit: 20,
-}
-
-const fetchData = async (url: string) => {
-  const response = await fetch(url)
-
-  if (!response.ok) {
-    throw new Error(`HTTP error ${response.status}`)
-  }
-  return response.json()
-}
-
-export const useFetch = (url: string) => {
+export const useFetch = (url: string, params?: QueryParamsT) => {
   const [data, setData] = useState<DataT[] | null>(null)
   const [error, setError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const refetch = useCallback(
-    (params: ParamsT) => {
+    (params: QueryParamsT) => {
       setData(null)
       setError(false)
       makeRequest(params)
@@ -39,17 +28,14 @@ export const useFetch = (url: string) => {
   )
 
   useEffect(() => {
-    makeRequest()
+    makeRequest(params)
   }, [url])
 
-  async function makeRequest(params: ParamsT = paramsDefault) {
+  async function makeRequest(params: QueryParamsT) {
     try {
-      const fetchedData = await fetchData(url)
-      const filteredData = params._limit
-        ? fetchedData.slice(0, params._limit)
-        : fetchedData
-
-      setData(filteredData)
+      setIsLoading(true)
+      const data = await fetchData(url, params)
+      setData(data)
     } catch (err) {
       setError(true)
       throw err
@@ -59,4 +45,15 @@ export const useFetch = (url: string) => {
   }
 
   return { data, error, isLoading, refetch }
+}
+
+async function fetchData(url: string, params: QueryParamsT) {
+  const queryParams = new URLSearchParams(params).toString()
+  const response = await fetch(`${url}?${queryParams}`)
+
+  if (!response.ok) {
+    throw new Error(`HTTP error ${response.status}`)
+  }
+
+  return response.json()
 }
